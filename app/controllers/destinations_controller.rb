@@ -10,25 +10,31 @@ class DestinationsController < ApplicationController
   # GET /destinations/1
   # GET /destinations/1.json
   def show
+    Rails.logger.debug params.inspect
+    @trip = @destination.trip
   end
 
   # GET /destinations/new
   def new
+    @trip = Trip.find(params[:trip_id])
     @destination = Destination.new
   end
 
   # GET /destinations/1/edit
   def edit
+    @trip = Trip.find(params[:trip_id])
+    @destination = Destination.find(params[:id])
   end
 
   # POST /destinations
   # POST /destinations.json
   def create
-    @destination = Destination.new(destination_params)
+    @trip = Trip.find(params[:trip_id])
+    @destination = @trip.destinations.new(params[:id])
 
     respond_to do |format|
       if @destination.save
-        format.html { redirect_to @destination, notice: 'Destination was successfully created.' }
+        format.html { redirect_to trip_destination_path(@trip, @destination), notice: 'Destination was successfully created.' }
         format.json { render :show, status: :created, location: @destination }
       else
         format.html { render :new }
@@ -42,7 +48,7 @@ class DestinationsController < ApplicationController
   def update
     respond_to do |format|
       if @destination.update(destination_params)
-        format.html { redirect_to @destination, notice: 'Destination was successfully updated.' }
+        format.html { redirect_to trip_destination_path(@destination.trip, @destination), notice: 'Destination was successfully updated.' }
         format.json { render :show, status: :ok, location: @destination }
       else
         format.html { render :edit }
